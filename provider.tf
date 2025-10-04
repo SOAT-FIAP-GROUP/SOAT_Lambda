@@ -6,6 +6,12 @@ terraform {
     }
   }
   required_version = ">= 1.0"
+  backend "s3" {
+    bucket         = "meu-terraform-states-soat"
+    key            = "env:/dev/lambda/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks-soat"
+  }
 }
 
 provider "aws" {
