@@ -47,6 +47,10 @@ resource "aws_cognito_user_pool" "user_pool" {
     allow_admin_create_user_only = false
   }
 
+  lifecycle {
+    ignore_changes = [schema]
+  }
+
   # Remove username_attributes / alias_attributes
   tags = {
     Project = var.project_name
