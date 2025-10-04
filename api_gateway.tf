@@ -124,6 +124,11 @@ resource "aws_api_gateway_stage" "stage" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   deployment_id = aws_api_gateway_deployment.deployment.id
   stage_name    = "prod"
+
+  lifecycle {
+    # Isso garante que mudanças no deployment não tentem recriar o stage
+    ignore_changes = [deployment_id]
+  }
 }
 
 # Give API Gateway permission to invoke the Lambdas
