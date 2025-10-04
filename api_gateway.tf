@@ -125,6 +125,9 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   stage_name    = "prod"
 
+  depends_on = [
+    aws_api_gateway_deployment.deployment
+  ]
   lifecycle {
     # Isso garante que mudanças no deployment não tentem recriar o stage
     ignore_changes = [deployment_id]
