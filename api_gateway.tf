@@ -1,8 +1,3 @@
-#ELB uri
-data "aws_elb" "lanchonete_lb" {
-  name = "lanchonete-service"
-}
-
 # REST API
 resource "aws_api_gateway_rest_api" "api" {
   name        = "${var.project_name}-api"
@@ -192,7 +187,7 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   http_method             = aws_api_gateway_method.proxy_any.http_method
   type                    = "HTTP_PROXY"
   integration_http_method = "ANY"
-  uri = "http://${data.aws_elb.lanchonete_lb.dns_name}:8080/{proxy}"
+  uri = "http://${var.lanchonete_service_dns}:8080/{proxy}"
   passthrough_behavior    = "WHEN_NO_MATCH"
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
