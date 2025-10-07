@@ -95,4 +95,4 @@ jobs:
         if: ${{ inputs.destroy != 'true' }}
         run: |
           terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
-          terraform apply -auto-approve "${{ inputs.environment }}.plan" -var "lanchonete_service_dns=${{ env.LB_DNS }}"
+          terraform apply -auto-approve "${{ inputs.environment }}.plan"
