@@ -33,11 +33,11 @@ resource "aws_api_gateway_resource" "me" {
 
 # Cognito Authorizer
 resource "aws_api_gateway_authorizer" "cognito_authorizer" {
-  name                   = "${var.project_name}-cognito-auth"
-  rest_api_id            = aws_api_gateway_rest_api.api.id
-  type                   = "COGNITO_USER_POOLS"
-  provider_arns          = [aws_cognito_user_pool.user_pool.arn]
-  identity_source        = "method.request.header.Authorization"
+  name                             = "${var.project_name}-cognito-auth"
+  rest_api_id                      = aws_api_gateway_rest_api.api.id
+  type                             = "COGNITO_USER_POOLS"
+  provider_arns                    = [aws_cognito_user_pool.user_pool.arn]
+  identity_source                  = "method.request.header.Authorization"
   authorizer_result_ttl_in_seconds = 300
 }
 
@@ -158,3 +158,40 @@ resource "aws_lambda_permission" "allow_apigw_getuser" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*/me"
 }
+
+# ========================================================================
+#                        INCLUI OS PATHS DA APLICAÇÃO
+# ========================================================================
+
+resource "aws_api_gateway_resource" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "{proxy+}"
+}
+
+resource "aws_api_gateway_method" "proxy_any" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "ANY"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.path.proxy"           = true
+    "method.request.header.Authorization" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "proxy_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.proxy.id
+  http_method             = aws_api_gateway_method.proxy_any.http_method
+  type                    = "HTTP_PROXY"
+  integration_http_method = "ANY"
+  uri                     = "http://ac3fd627d92b148b59805b3e042c5f0b-242762989.us-east-1.elb.amazonaws.com:8080/{proxy}"
+  passthrough_behavior    = "WHEN_NO_MATCH"
+  request_parameters = {
+    "integration.request.path.proxy" = "method.request.path.proxy"
+  }
+}
+
+

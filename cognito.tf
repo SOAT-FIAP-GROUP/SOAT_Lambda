@@ -4,10 +4,10 @@ resource "aws_cognito_user_pool" "user_pool" {
   # Identity will be the username (required)
   # Custom attributes cannot be required; mark them optional
   schema {
-    name      = "cpf"
+    name                = "cpf"
     attribute_data_type = "String"
-    required  = false        # change to false
-    mutable   = false
+    required            = false # change to false
+    mutable             = false
     string_attribute_constraints {
       min_length = 11
       max_length = 11
@@ -15,24 +15,24 @@ resource "aws_cognito_user_pool" "user_pool" {
   }
 
   schema {
-    name      = "name"
+    name                = "name"
     attribute_data_type = "String"
-    required  = false        # optional
-    mutable   = true
+    required            = false # optional
+    mutable             = true
   }
 
   schema {
-    name      = "email"
+    name                = "email"
     attribute_data_type = "String"
-    required  = false
-    mutable   = true
+    required            = false
+    mutable             = true
   }
 
   schema {
-    name      = "cellphone"
+    name                = "cellphone"
     attribute_data_type = "String"
-    required  = false
-    mutable   = true
+    required            = false
+    mutable             = true
   }
 
   password_policy {
@@ -68,16 +68,16 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
     "ALLOW_ADMIN_USER_PASSWORD_AUTH"
   ]
 
-  generate_secret = false
+  generate_secret               = false
   prevent_user_existence_errors = "ENABLED"
 
   allowed_oauth_flows_user_pool_client = false
-  supported_identity_providers = ["COGNITO"]
+  supported_identity_providers         = ["COGNITO"]
 }
 
 # Optional: hosted UI domain (useful if you want the Cognito Hosted UI)
 resource "aws_cognito_user_pool_domain" "domain" {
-  count       = var.enable_user_pool_domain ? 1 : 0
-  domain      = var.user_pool_domain_prefix
+  count        = var.enable_user_pool_domain ? 1 : 0
+  domain       = var.user_pool_domain_prefix
   user_pool_id = aws_cognito_user_pool.user_pool.id
 }
