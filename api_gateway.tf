@@ -1,3 +1,6 @@
+
+
+
 # REST API
 resource "aws_api_gateway_rest_api" "api" {
   name        = "${var.project_name}-api"
@@ -187,7 +190,7 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   http_method             = aws_api_gateway_method.proxy_any.http_method
   type                    = "HTTP_PROXY"
   integration_http_method = "ANY"
-  uri                     = "http://ac3fd627d92b148b59805b3e042c5f0b-242762989.us-east-1.elb.amazonaws.com:8080/{proxy}"
+  uri                     = "http://a7efc8e0093af4439b9c105bd549b5ee-1296668046.us-east-1.elb.amazonaws.com:8080/{proxy}"
   passthrough_behavior    = "WHEN_NO_MATCH"
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
