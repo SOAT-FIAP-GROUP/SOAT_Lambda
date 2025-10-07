@@ -54,6 +54,20 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ inputs.aws-region }}
 
+      - name: Configure kubectl
+        if: ${{ inputs.destroy != 'true' }}
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ inputs.aws-region }} \
+            --name lanchonete-app-dev
+
+      - name: Get LoadBalancer DNS
+        if: ${{ inputs.destroy != 'true' }}
+        id: get_lb
+        run: |
+          LB_DNS=$(kubectl get svc lanchonete-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "LB_DNS=$LB_DNS" >> $GITHUB_ENV
+
       - name: Terraform Init
         run: |
           terraform init \
@@ -75,7 +89,7 @@ jobs:
         if: ${{ inputs.destroy != 'true' }}
         run: |
           terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
-          terraform plan -out="${{ inputs.environment }}.plan"
+          terraform plan -out="${{ inputs.environment }}.plan" -var "lanchonete_service_dns=${{ env.LB_DNS }}"
 
       - name: Terraform Apply
         if: ${{ inputs.destroy != 'true' }}

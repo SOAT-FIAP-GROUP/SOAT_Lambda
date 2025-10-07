@@ -38,3 +38,8 @@ variable "user_pool_domain_prefix" {
   type        = string
   default     = "my-auth-domain"
 }
+
+#ELB uri
+variable "lanchonete_service_dns" {
+  type = string
+}
