@@ -65,8 +65,14 @@ jobs:
         if: ${{ inputs.destroy != 'true' }}
         id: get_lb
         run: |
-          LB_DNS=$(kubectl get svc lanchonete-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-          echo "LB_DNS=$LB_DNS" >> $GITHUB_ENV
+          LB_DNS_PRODUTO=$(kubectl get svc produto-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          LB_DNS_PEDIDO=$(kubectl get svc pedido-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          LB_DNS_PAGAMENTO=$(kubectl get svc pagamento-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          LB_DNS_PRODUCAO=$(kubectl get svc producao-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          echo "LB_DNS_PRODUTO=$LB_DNS_PRODUTO" >> $GITHUB_ENV
+          echo "LB_DNS_PEDIDO=$LB_DNS_PEDIDO" >> $GITHUB_ENV
+          echo "LB_DNS_PAGAMENTO=$LB_DNS_PAGAMENTO" >> $GITHUB_ENV
+          echo "LB_DNS_PRODUCAO=$LB_DNS_PRODUCAO" >> $GITHUB_ENV
 
       - name: Terraform Init
         run: |
@@ -89,7 +95,14 @@ jobs:
         if: ${{ inputs.destroy != 'true' }}
         run: |
           terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
-          terraform plan -out="${{ inputs.environment }}.plan" -var "lanchonete_service_dns=${{ env.LB_DNS }}"
+          terraform plan \
+            -out="${{ inputs.environment }}.plan" \
+            -var='services={
+              produto_service_dns = "${{ env.LB_DNS_PRODUTO }}"
+              pedido_service_dns  = "${{ env.LB_DNS_PEDIDO }}"
+              pagamento_service_dns    = "${{ env.LB_DNS_PAGAMENTO }}"
+              producao_service_dns    = "${{ env.LB_DNS_PRODUCAO }}"
+            }'
 
       - name: Terraform Apply
         if: ${{ inputs.destroy != 'true' }}
