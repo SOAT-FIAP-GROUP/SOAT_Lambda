@@ -26,4 +26,4 @@ jobs:
       destroy: ${{ github.event.inputs.destroy || 'false' }}
     secrets:
       aws-assume-role-arn: ${{ secrets.AWS_ASSUME_ROLE_ARN_LAMBDA }}
-      aws-statefile-s3-bucket: ${{ secrets.BUCKET_S3_NAME }}
+      aws-statefile-s3-bucket: ${{ secrets.AWS_BUCKET_NAME }}
