@@ -21,9 +21,9 @@ jobs:
     with:
       environment: dev
       aws-region: "${{ vars.AWS_REGION }}"
-      aws-statefile-key: "lambda-api/terraform.tfstate"
+      aws-statefile-key: "lambda/terraform.tfstate"
       aws-lock-dynamodb-table: "${{ vars.DYNAMODB_TABLE }}"
       destroy: ${{ github.event.inputs.destroy || 'false' }}
     secrets:
       aws-assume-role-arn: ${{ secrets.AWS_ASSUME_ROLE_ARN_LAMBDA }}
-      aws-statefile-s3-bucket: ${{ secrets.AWS_BUCKET_NAME }}
+      aws-statefile-s3-bucket: "${{ secrets.AWS_BUCKET_NAME }}"

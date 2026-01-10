@@ -1,5 +1,4 @@
 name: "Terraform Workflow for Lambda"
-
 on:
   workflow_call:
     inputs:
