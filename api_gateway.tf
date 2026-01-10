@@ -181,53 +181,15 @@ resource "aws_api_gateway_method" "proxy_any" {
   }
 }
 
-resource "aws_api_gateway_integration" "proxy_integration_produto" {
+resource "aws_api_gateway_integration" "proxy_integration" {
+  for_each = var.services
+
   rest_api_id             = aws_api_gateway_rest_api.api.id
   resource_id             = aws_api_gateway_resource.proxy.id
   http_method             = aws_api_gateway_method.proxy_any.http_method
   type                    = "HTTP_PROXY"
   integration_http_method = "ANY"
-  uri                     = "http://${var.services[0]}:8080/{proxy}"
-  passthrough_behavior    = "WHEN_NO_MATCH"
-  request_parameters = {
-    "integration.request.path.proxy" = "method.request.path.proxy"
-  }
-}
-
-resource "aws_api_gateway_integration" "proxy_integration_pedido" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy_any.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "http://${var.services[1]}:8080/{proxy}"
-  passthrough_behavior    = "WHEN_NO_MATCH"
-  request_parameters = {
-    "integration.request.path.proxy" = "method.request.path.proxy"
-  }
-}
-
-resource "aws_api_gateway_integration" "proxy_integration_pagamento" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy_any.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "http://${var.services[2]}:8080/{proxy}"
-  passthrough_behavior    = "WHEN_NO_MATCH"
-  request_parameters = {
-    "integration.request.path.proxy" = "method.request.path.proxy"
-  }
-}
-
-
-resource "aws_api_gateway_integration" "proxy_integration_producao" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy_any.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "http://${var.services[3]}:8080/{proxy}"
+  uri                     = "http://${each.value}:8080/{proxy}"
   passthrough_behavior    = "WHEN_NO_MATCH"
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"
