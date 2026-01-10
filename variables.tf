@@ -42,4 +42,5 @@ variable "user_pool_domain_prefix" {
 #ELB uri
 variable "services" {
   type = map(string)
+  default = {}
 }
