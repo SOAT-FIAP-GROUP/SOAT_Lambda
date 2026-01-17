@@ -97,10 +97,10 @@ jobs:
           terraform plan \
             -out="${{ inputs.environment }}.plan" \
             -var='services={
-              produto_service_dns = "${{ env.LB_DNS_PRODUTO }}"
-              pedido_service_dns  = "${{ env.LB_DNS_PEDIDO }}"
-              pagamento_service_dns    = "${{ env.LB_DNS_PAGAMENTO }}"
-              producao_service_dns    = "${{ env.LB_DNS_PRODUCAO }}"
+              produtos = "${{ env.LB_DNS_PRODUTO }}"
+              pedidos  = "${{ env.LB_DNS_PEDIDO }}"
+              pagamentos    = "${{ env.LB_DNS_PAGAMENTO }}"
+              producao    = "${{ env.LB_DNS_PRODUCAO }}"
             }'
 
       - name: Terraform Apply
