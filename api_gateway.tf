@@ -163,15 +163,24 @@ resource "aws_lambda_permission" "allow_apigw_getuser" {
 #                        INCLUI OS PATHS DA APLICAÇÃO
 # ========================================================================
 
-resource "aws_api_gateway_resource" "proxy" {
+resource "aws_api_gateway_resource" "services" {
+  for_each = var.services
   rest_api_id = aws_api_gateway_rest_api.api.id
   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "${each.key}"
+}
+
+resource "aws_api_gateway_resource" "proxy" {
+  for_each = var.services
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_resource.services[each.key].id
   path_part   = "{proxy+}"
 }
 
 resource "aws_api_gateway_method" "proxy_any" {
+  for_each = var.services
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.proxy.id
+  resource_id   = aws_api_gateway_resource.proxy[each.key].id
   http_method   = "ANY"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
@@ -183,10 +192,9 @@ resource "aws_api_gateway_method" "proxy_any" {
 
 resource "aws_api_gateway_integration" "proxy_integration" {
   for_each = var.services
-
   rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy_any.http_method
+  resource_id             = aws_api_gateway_resource.proxy[each.key].id
+  http_method             = aws_api_gateway_method.proxy_any[each.key].http_method
   type                    = "HTTP_PROXY"
   integration_http_method = "ANY"
   uri                     = "http://${each.value}:8080/{proxy}"
